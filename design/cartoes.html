@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cartões</title><link rel="stylesheet" href="tokens.css">
+<style>
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.cc-head { display: flex; align-items: center; gap: 12px; }
+.cc-logo { width: 40px; height: 28px; border-radius: 6px; display: grid; place-items: center; font-size: 13px; font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+.stat { padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.stat .l { font-size: 13px; color: var(--muted); } .stat .v { font-size: 17px; font-weight: 500; margin-top: 4px; }
+.cycle { display: grid; grid-template-columns: repeat(31, 1fr); gap: 2px; margin-top: 14px; }
+.cycle i { height: 22px; border-radius: 3px; background: var(--surface-3); }
+.cycle i.best { background: var(--ink-2); } .cycle i.close { background: var(--warning); } .cycle i.due { background: var(--out); } .cycle i.today { outline: 2px solid var(--focus); outline-offset: 1px; }
+.lower { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; margin-top: 16px; }
+.inst .row { display: grid; grid-template-columns: 1fr auto auto; gap: 24px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
+</style></head>
+<body><div class="app" id="app"></div>
+<script src="app.js"></script>
+<script>
+const card = (name, logoBg, logoInk, used, limit, open, close, due, best, color) => `
+<div class="card"><div class="cc-head">${bank(name === 'Nubank' ? 'nu' : 'inter')}
+  <div style="flex:1"><div style="font-weight:500">Cartão ${name}</div><div class="t-xs muted">final 4821 · fecha dia ${close} · vence dia ${due}</div></div><span class="chip">Fatura aberta</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:18px"><span class="t-sm muted">Limite usado</span><span class="num t-sm"><b style="font-weight:500">${brl(used)}</b> <span class="muted">de ${brl(limit).replace(',00', '')}</span></span></div>
+  <div class="bar-track" style="margin-top:8px;height:8px"><div class="bar-fill" style="width:${used / limit * 100}%;background:var(--ink-2)"></div></div>
+  <div class="stats"><div class="stat"><div class="l">Fatura atual</div><div class="v num">${brl(open)}</div></div>
+   <div class="stat"><div class="l">Melhor dia de compra</div><div class="v num">dia ${best}</div></div>
+   <div class="stat"><div class="l">Parcelas futuras</div><div class="v num">${brl(color)}</div></div></div>
+  <div class="cycle" aria-label="Ciclo do cartão">${Array.from({ length: 31 }, (_, i) => { const d = i + 1; return `<i class="${d === close ? 'close' : d === due ? 'due' : d === best ? 'best' : ''} ${d === 17 ? 'today' : ''}" title="${d}"></i>`; }).join('')}</div>
+  <div class="t-xs muted" style="display:flex;gap:16px;margin-top:8px"><span><i class="sw dot" style="background:var(--ink-2);display:inline-block"></i> melhor dia</span><span><i class="dot" style="background:var(--warning);display:inline-block"></i> fechamento</span><span><i class="dot" style="background:var(--out);display:inline-block"></i> vencimento</span><span style="color:var(--focus)">▢ hoje</span></div>
+</div>`;
+document.getElementById('app').innerHTML = sidebar('cartoes') + `<main class="main">${topbar('Cartões de crédito')}
+<div class="content"><div class="cards">${card('Nubank', 'var(--surface-3)', 'var(--ink)', 6840.2, 12000, 2180.44, 13, 20, 14, 4659.76)}${card('Inter', 'var(--surface-3)', 'var(--ink)', 1912.35, 8000, 1203.55, 5, 12, 6, 708.8)}</div>
+<div class="lower">
+ <div class="card"><h3>Parcelas futuras · próximos 6 meses<span class="sp"></span><span class="t-xs muted">soma dos dois cartões</span></h3><div id="inst" style="margin-top:14px"></div></div>
+ <div class="card inst"><h3>Compras parceladas ativas</h3><div style="margin-top:6px">
+  ${[['Amazon · notebook stand', '3 de 6', 289.9], ['Decathlon', '2 de 4', 174.75], ['Fast Shop · air fryer', '5 de 10', 59.9], ['Leroy Merlin', '1 de 3', 213.3]]
+    .map(([n, p, v]) => `<div class="row"><span>${n}</span><span class="muted num">${p}</span><span class="num">${brl(v)}/mês</span></div>`).join('')}</div></div>
+</div></div></main>`;
+(function () {
+  const m = [['dez', 1940.5], ['jan', 1650.2], ['fev', 980.4], ['mar', 612.3], ['abr', 349.8], ['mai', 289.9]];
+  const W = 640, H = 200, L = 52, B = 26, T = 18, max = 2500, y = v => T + (1 - v / max) * (H - T - B), gw = (W - L) / m.length, bw = 34;
+  let s = '';
+  [0, 1000, 2000].forEach(v => s += `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="${v ? 'var(--grid)' : 'var(--axis)'}"/><text x="${L - 8}" y="${y(v) + 4}" font-size="13" fill="var(--muted)" text-anchor="end">${v ? v / 1000 + ' mil' : '0'}</text>`);
+  m.forEach(([n, v], i) => { const cx = L + gw * i + gw / 2 - bw / 2, r = 4;
+    s += `<path d="M${cx} ${H - B}V${y(v) + r}q0 -${r} ${r} -${r}h${bw - 2 * r}q${r} 0 ${r} ${r}V${H - B}Z" fill="var(--c1)"/>`;
+    s += `<text x="${cx + bw / 2}" y="${H - 6}" font-size="13" fill="var(--muted)" text-anchor="middle">${n}</text>`;
+    if (i === 0) s += `<text x="${cx + bw / 2}" y="${y(v) - 6}" font-size="13" fill="var(--ink-2)" text-anchor="middle">${brl(v)}</text>`; });
+  document.getElementById('inst').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Parcelas futuras por mês">${s}</svg>`;
+})();
+</script></body></html>

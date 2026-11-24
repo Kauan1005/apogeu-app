@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transações</title><link rel="stylesheet" href="tokens.css">
+<style>
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar .sp { flex: 1; }
+.sheet { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--surface-1); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 13px; height: 40px; padding: 0 12px; border-bottom: 1px solid var(--border); background: var(--surface-1); white-space: nowrap; }
+th .i { width: 14px; height: 14px; vertical-align: -3px; margin-left: 4px; }
+td { white-space: nowrap; height: 48px; padding: 0 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+td.r, th.r { text-align: right; }
+tr.group td { height: 36px; background: var(--bg); color: var(--ink-2); font-size: 13px; font-weight: 500; }
+tr.sel td { background: rgba(127, 180, 255, 0.06); }
+tr.muted-row td { color: var(--muted); }
+.cb { flex: none; width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border-strong); display: inline-block; vertical-align: middle; }
+.cb.on { background: var(--ink); border-color: var(--ink); position: relative; }
+.cb.on::after { content: ""; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid var(--bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.desc b { font-weight: 500; display: block; } .desc { max-width: 250px; overflow: hidden; text-overflow: ellipsis; } .desc span { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+.cat { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid transparent; }
+.cat:hover, .cat.edit { border-color: var(--border-strong); background: var(--surface-2); }
+.cat.edit { outline: 2px solid var(--focus); outline-offset: 1px; }
+.conf { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.menu { position: absolute; z-index: 5; width: 260px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 12px; padding: 6px; box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+.menu .q { display: flex; gap: 8px; align-items: center; height: 36px; padding: 0 10px; color: var(--muted); border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.menu .o { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; color: var(--ink-2); }
+.menu .o.hl { background: var(--surface-3); color: var(--ink); }
+.menu .o kbd { margin-left: auto; font: 13px var(--mono); color: var(--muted); }
+.menu .rule { margin-top: 4px; padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.sub td { height: 38px; background: rgba(255,255,255,.015); font-size: 13px; }
+.strike { text-decoration: line-through; color: var(--muted); font-size: 13px; display: block; }
+.foot-bar { white-space: nowrap; display: flex; gap: 24px; align-items: center; padding: 12px 16px; font-size: 13px; color: var(--ink-2); background: var(--surface-2); }
+.foot-bar .sp { flex: 1; }
+.tagx { display: inline-flex; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--surface-3); font-size: 13px; color: var(--ink-2); align-items: center; }
+</style></head>
+<body><div class="app" id="app"></div>
+<script src="app.js"></script>
+<script>
+const acc = { nu: 'Nubank', inter: 'Inter', brad: 'Bradesco', sant: 'Santander', mp: 'Mercado Pago', nucc: 'Cartão Nubank', intercc: 'Cartão Inter' };
+const conf = (p) => p >= 85 ? `<span class="conf muted">${icon('check', 'sm')}Regra</span>` : p >= 60
+  ? `<span class="conf ink2"><span class="dot" style="background:var(--ink-2)"></span>${p}%</span>`
+  : `<span class="conf" style="color:var(--warning)">${icon('alert', 'sm')}Revisar · ${p}%</span>`;
+const row = (o) => `<tr class="${o.cls || ''}"><td style="width:40px"><i class="cb ${o.sel ? 'on' : ''}"></i></td>
+  <td class="num" style="width:96px">${o.h || '<span class="muted">—</span>'}</td>
+  <td class="desc"><b>${o.n}</b><span>${o.raw}</span></td>
+  <td style="position:relative"><span class="cat ${o.edit ? 'edit' : ''}"><span class="dot" style="background:${o.c || 'var(--ink-2)'}"></span>${CATS[o.k].n}${icon('chevdown', 'sm')}</span>${o.menu || ''}</td>
+  <td class="ink2"><span class="acct">${bank(o.a)}${acc[o.a]}${o.pix ? `<span class="muted" title="Pix">${icon('pix', 'sm')}</span>` : ''}</span></td>
+  <td>${(o.tags || []).map(t => `<span class="tagx">${t}</span>`).join(' ')}</td>
+  <td>${o.status || conf(o.p || 95)}</td>
+  <td style="width:36px" class="muted">${o.clip ? icon('clip', 'sm') : ''}</td>
+  <td class="r num" style="width:150px">${o.vHtml || `<span class="${o.v > 0 ? 'in' : ''}">${brl(o.v, true)}</span>`}</td></tr>`;
+
+const menu = `<div class="menu" style="left:12px;top:44px"><div class="q">${icon('search', 'sm')}Buscar categoria</div>
+  ${[['alimentacao', 'var(--c2)', '1'], ['lazer', 'var(--c6)', '2'], ['compras', 'var(--c5)', '3'], ['assinaturas', 'var(--c-rest)', '4'], ['outros', 'var(--c-rest)', '5']]
+    .map(([k, c, n], i) => `<div class="o ${i === 1 ? 'hl' : ''}"><span class="dot" style="background:${c}"></span>${CATS[k].n}<kbd>${n}</kbd></div>`).join('')}
+  <div class="rule"><i class="cb on"></i>Sempre usar Lazer para “Bar do Zé”</div></div>`;
+
+document.getElementById('app').innerHTML = sidebar('tabela') + `<main class="main">${topbar('Transações', `<button class="btn">${icon('download', 'sm')}Exportar${icon('chevdown', 'sm')}</button><button class="btn primary">${icon('plus', 'sm')}Lançamento</button>`)}
+<div class="content">
+ <div class="toolbar">
+   <div class="field">${icon('search', 'sm')}Buscar descrição, valor, tag…</div>
+   <span class="chip">${icon('filter', 'sm')}Conta: todas</span><span class="chip">Categoria: todas</span>
+   <span class="chip" style="color:var(--warning)">${icon('alert', 'sm')}Só a revisar (7)</span>
+   <span class="sp"></span>
+   <div class="seg"><span class="on">Dia</span><span>Categoria</span><span>Mês</span><span>Conta</span></div>
+ </div>
+ <div class="sheet"><table>
+  <thead><tr><th><i class="cb"></i></th><th>Data${icon('chevdown')}</th><th>Descrição</th><th>Categoria</th><th>Conta</th><th>Tags</th><th>Classificação</th><th></th><th class="r">Valor</th></tr></thead>
+  <tbody>
+   <tr class="group"><td colspan="8">Hoje · terça, 17/11</td><td class="r num">− R$ 156,80</td></tr>
+   ${row({ h: '12:41', n: 'Bar do Zé', raw: 'PIX ENVIADO JOSE C S 17/11', k: 'alimentacao', c: 'var(--c2)', a: 'nu', pix: 1, v: -78, p: 54, edit: 1, menu, cls: 'sel', sel: 1 })}
+   ${row({ h: '08:05', n: 'Uber', raw: 'UBER *TRIP HELP.UBER.COM', k: 'transporte', c: 'var(--c4)', a: 'intercc', v: -23.9, p: 99 })}
+   ${row({ h: '07:58', n: 'Padaria Real', raw: 'PADARIA REAL LTDA', k: 'alimentacao', c: 'var(--c2)', a: 'nucc', v: -18.5, p: 92 })}
+   ${row({ h: '—', n: 'Drogasil', raw: 'RD DROGASIL 0412', k: 'saude', a: 'nucc', v: -36.4, p: 71 })}
+   <tr class="group"><td colspan="8">Segunda, 16/11</td><td class="r num">− R$ 95,00</td></tr>
+   ${row({ h: '20:17', n: 'Mercado Livre', raw: 'MERCADOLIVRE*TECHSTORE', k: 'compras', c: 'var(--c5)', a: 'mp', v: 0,
+      vHtml: `<span class="strike">− R$ 249,90</span><span class="muted">R$ 0,00</span>`, status: `<span class="conf muted">${icon('x', 'sm')}Cancelada no banco</span>`, cls: 'muted-row' })}
+   ${row({ h: '18:30', n: 'Pão de Açúcar', raw: 'PAO DE ACUCAR 1123', k: 'alimentacao', c: 'var(--c2)', a: 'inter', v: -95, p: 98, tags: ['dividido'], clip: 1 })}
+   <tr class="sub"><td></td><td></td><td class="ink2" style="padding-left:28px">↳ Mercado da casa</td><td><span class="cat"><span class="dot" style="background:var(--c2)"></span>Alimentação</span></td><td></td><td></td><td></td><td></td><td class="r num">− R$ 72,00</td></tr>
+   <tr class="sub"><td></td><td></td><td class="ink2" style="padding-left:28px">↳ Produtos de limpeza</td><td><span class="cat"><span class="dot" style="background:var(--c1)"></span>Moradia</span></td><td></td><td></td><td></td><td></td><td class="r num">− R$ 23,00</td></tr>
+   <tr class="group"><td colspan="8">Domingo, 15/11</td><td class="r num">+ R$ 1.388,20</td></tr>
+   ${row({ h: '14:02', n: 'Pix de Ana Paula R.', raw: 'PIX RECEBIDO ANA PAULA RIBEIRO', k: 'outros', a: 'brad', pix: 1, v: 1500, p: 48 })}
+   ${row({ h: '11:20', n: 'Nubank → Inter', raw: 'TRANSF ENTRE CONTAS PROPRIAS', k: 'interna', a: 'nu', pix: 1, v: -500, cls: 'muted-row',
+      status: `<span class="conf muted">${icon('transfer', 'sm')}Fora dos gastos</span>`, vHtml: '<span class="muted">− R$ 500,00</span>' })}
+   ${row({ h: '09:47', n: 'Spotify', raw: 'SPOTIFY P1A2B3C4', k: 'assinaturas', a: 'intercc', v: -21.9, p: 99, tags: ['recorrente'] })}
+   ${row({ h: '09:47', n: 'Spotify', raw: 'SPOTIFY P1A2B3C4', k: 'assinaturas', a: 'intercc', v: -21.9,
+      status: `<span class="conf" style="color:var(--warning)">${icon('alert', 'sm')}Possível duplicada</span>` })}
+   ${row({ h: '—', n: 'Rendimento CDB', raw: 'REND PAGO APLIC AUT', k: 'rendimentos', a: 'sant', v: 3.4, p: 99 })}
+  </tbody></table>
+  <div class="foot-bar"><span>1 selecionada</span><button class="btn ghost" style="height:30px">${icon('tag', 'sm')}Categoria</button><button class="btn ghost" style="height:30px">${icon('split', 'sm')}Dividir</button><button class="btn ghost" style="height:30px">${icon('clip', 'sm')}Comprovante</button>
+   <span class="sp"></span><span>13 de 184 em novembro</span><span class="num">Saídas <b class="out">R$ 6.214,37</b></span><span class="num">Entradas <b class="in">R$ 11.353,40</b></span></div>
+ </div>
+</div></main>`;
+</script></body></html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contas a pagar</title><link rel="stylesheet" href="tokens.css">
+<style>
+.wrap2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; align-items: start; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+.cal .h { font-size: 13px; color: var(--muted); text-align: center; padding-bottom: 4px; }
+.cal .d { min-height: 62px; border: 1px solid var(--border); border-radius: 10px; padding: 8px; font-size: 13px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
+.cal .d.off { opacity: .35; } .cal .d.today { border-color: var(--focus); }
+.cal .ev { font-size: 13px; padding: 4px 6px; width: fit-content; border-radius: 6px; background: var(--surface-3); color: var(--ink); line-height: 1.25; display: flex; gap: 4px; align-items: center; }
+.cal .ev .i { width: 16px; height: 16px; }
+.bill { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+.bill:first-of-type { border-top: 0; }
+.st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; height: 26px; padding: 0 10px; border-radius: 999px; }
+.st.paid { background: rgba(12,163,12,.14); color: #4cc44c; } .st.pend { background: var(--surface-3); color: var(--ink-2); } .st.late { background: rgba(208,59,59,.16); color: #ef7a7a; }
+.recon { margin-top: 4px; font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+</style></head>
+<body><div class="app" id="app"></div>
+<script src="app.js"></script>
+<script>
+const ev = { 5: [['Aluguel', 'check']], 10: [['Sabesp', 'check']], 12: [['Fatura Inter', 'check']], 15: [['Faculdade', 'alert']], 20: [['Fatura Nubank', 'clock']], 22: [['Enel', 'clock']], 25: [['Condomínio', 'clock']], 28: [['Vivo Fibra', 'clock']] };
+let cells = ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'].map(d => `<div class="h">${d}</div>`).join('');
+for (let i = 0; i < 42; i++) { const d = i - 6; const off = d < 1 || d > 30; const n = off ? (d < 1 ? 31 + d : d - 30) : d;
+  cells += `<div class="d ${off ? 'off' : ''} ${d === 17 ? 'today' : ''}"><span class="num">${n}</span>${!off && ev[d] ? ev[d].map(([t, ic]) => `<span class="ev" title="${t}" style="${ic === 'alert' ? 'color:#ef7a7a' : ic === 'check' ? 'color:var(--muted)' : ''}">${icon(ic)}</span>`).join('') : ''}</div>`; }
+const B = [
+  ['receipt', 'Faculdade · parcela 9/12', 'venceu 15/11 · boleto', 749.9, 'late', 'Atrasada 2 dias', ''],
+  ['card', 'Fatura Nubank', 'vence 20/11 · fecha 13/11', 2180.44, 'pend', 'Pendente', ''],
+  ['receipt', 'Enel', 'vence 22/11 · recorrente', 214.9, 'pend', 'Pendente', ''],
+  ['home', 'Condomínio', 'vence 25/11 · recorrente', 690, 'pend', 'Pendente', ''],
+  ['receipt', 'Vivo Fibra', 'vence 28/11 · recorrente', 119.99, 'pend', 'Pendente', ''],
+  ['home', 'Aluguel', 'venceu 05/11', 1850, 'paid', 'Pago', 'Conciliado com Pix de 05/11 09:14 · Nubank'],
+  ['card', 'Fatura Inter', 'venceu 12/11', 1188.2, 'paid', 'Pago', 'Conciliado com débito de 12/11 · Inter'],
+];
+document.getElementById('app').innerHTML = sidebar('contas') + `<main class="main">${topbar('Contas a pagar e receber', `<button class="btn primary">${icon('plus', 'sm')}Nova conta</button>`)}
+<div class="content">
+ <div class="sum"><div class="card kpi"><h3>A pagar até 30/11</h3><div class="v num">R$ 3.955,23</div><div class="d">5 contas</div></div>
+  <div class="card kpi"><h3>Atrasadas</h3><div class="v num" style="color:#ef7a7a">R$ 749,90</div><div class="d">${icon('alert', 'sm')}1 conta · Faculdade</div></div>
+  <div class="card kpi"><h3>Pagas e conciliadas</h3><div class="v num">R$ 3.038,20</div><div class="d">${icon('check', 'sm')}2 contas · automático</div></div></div>
+ <div class="wrap2">
+  <div class="card"><h3>Novembro 2026<span class="sp"></span><div class="seg"><span class="on">Mês</span><span>Lista</span></div></h3><div class="cal">${cells}</div></div>
+  <div class="card"><h3>Vencimentos</h3><div style="margin-top:6px">${B.map(([ic, n, s, v, st, stl, rec]) => `
+   <div class="bill"><span class="ico-box">${icon(ic)}</span><div><div>${n}</div><div class="t-xs muted">${s}</div>${rec ? `<div class="recon">${icon('link', 'sm')}${rec}</div>` : ''}</div>
+   <span class="num">${brl(v)}</span><span class="st ${st}">${icon(st === 'paid' ? 'check' : st === 'late' ? 'alert' : 'clock', 'sm')}${stl}</span></div>`).join('')}</div>
+   <div class="t-xs muted" style="margin-top:12px;display:flex;gap:8px;align-items:center">${icon('lock', 'sm')}Pagamento pelo site: fase posterior. Por enquanto, “Copiar código Pix/boleto” e abrir o app do banco.</div></div>
+ </div></div></main>`;
+</script></body></html>

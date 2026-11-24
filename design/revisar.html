@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Revisar</title><link rel="stylesheet" href="tokens.css">
+<style>
+.wrap2 { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+.focus-card { padding: 28px; }
+.amount { font-size: 40px; font-weight: 500; letter-spacing: -0.02em; }
+.raw { font-family: var(--mono); font-size: 13px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; display: inline-block; }
+.sugg { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--surface-2); }
+.meter { width: 120px; } .meter .bar-track { height: 4px; }
+.opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.opt { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border); color: var(--ink-2); }
+.opt kbd { margin-left: auto; font: 13px var(--mono); color: var(--muted); }
+.sim .row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.queue .q { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.queue .q:first-of-type { border-top: 0; }
+.queue .q.on { margin: 0 -12px; padding: 12px; border-radius: 10px; background: var(--surface-2); border-top-color: transparent; }
+.toast { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--surface-3); border: 1px solid var(--border-strong); font-size: 13px; }
+.progress { display: flex; gap: 4px; } .progress i { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-3); } .progress i.d { background: var(--ink-2); }
+</style></head>
+<body><div class="app" id="app"></div>
+<script src="app.js"></script>
+<script>
+document.getElementById('app').innerHTML = sidebar('revisar') + `<main class="main">${topbar('Revisar categorias')}
+<div class="content"><div class="wrap2">
+ <div class="grid">
+  <div class="progress"><i class="d"></i><i class="d"></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="card focus-card grid" style="gap:22px">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div class="grid" style="gap:8px"><span class="t-sm muted">3 de 7 · Nubank · Pix enviado · terça, 17/11 às 12:41</span>
+        <div style="font-size:20px;font-weight:500">Bar do Zé</div><span class="raw">PIX ENVIADO JOSE C S 17/11 · CPF ***.412.887-**</span></div>
+      <div class="amount num">− R$ 78,00</div></div>
+    <div class="sugg"><span class="ico-box" style="background:rgba(217,89,38,.16);color:var(--c2)">${icon('food')}</span>
+      <div style="flex:1"><div class="t-sm muted">Sugestão</div><div style="font-weight:500">Alimentação</div></div>
+      <div class="meter"><div class="t-xs muted" style="margin-bottom:6px">Confiança 54%</div><div class="bar-track"><div class="bar-fill" style="width:54%;background:var(--warning)"></div></div></div>
+      <button class="btn primary">${icon('check', 'sm')}Confirmar<span class="mono t-xs" style="opacity:.6">Enter</span></button></div>
+    <div><div class="t-sm muted" style="margin-bottom:10px">Ou escolha outra</div><div class="opts">
+      ${[['lazer', 'var(--c6)', 1], ['transporte', 'var(--c4)', 2], ['moradia', 'var(--c1)', 3], ['compras', 'var(--c5)', 4], ['saude', 'var(--c-rest)', 5], ['assinaturas', 'var(--c-rest)', 6], ['contas', 'var(--c3)', 7], ['outros', 'var(--c-rest)', 8]]
+        .map(([k, c, n]) => `<span class="opt"><span class="dot" style="background:${c}"></span>${CATS[k].n}<kbd>${n}</kbd></span>`).join('')}</div></div>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap" class="t-sm ink2">
+      <span style="display:flex;gap:8px;align-items:center"><i class="cb on"></i>Criar regra para este destinatário (CPF final 887)</span>
+      <span style="display:flex;gap:8px;align-items:center">${icon('split', 'sm')}Dividir</span><span style="display:flex;gap:8px;align-items:center">${icon('tag', 'sm')}Tag</span><span style="display:flex;gap:8px;align-items:center">${icon('clip', 'sm')}Comprovante</span>
+      <span class="sp" style="flex:1"></span><span class="muted">Pular · S</span></div>
+  </div>
+  <div class="card sim"><h3>Por que essa sugestão<span class="sp"></span><span class="t-xs muted">transações parecidas no seu histórico</span></h3>
+    <div style="margin-top:8px">
+     <div class="row"><span>PIX ENVIADO JOSE C S 03/10</span><span class="chip"><span class="dot" style="background:var(--c2)"></span>Alimentação</span><span class="num muted">89% parecida</span></div>
+     <div class="row"><span>BAR DO ZE VILA MADALENA</span><span class="chip"><span class="dot" style="background:var(--c6)"></span>Lazer</span><span class="num muted">81% parecida</span></div>
+     <div class="row"><span>PIX ENVIADO JOSE CARLOS SILVA</span><span class="chip"><span class="dot" style="background:var(--c1)"></span>Moradia</span><span class="num muted">63% parecida</span></div></div></div>
+ </div>
+ <div class="grid">
+  <div class="toast">${icon('check', 'sm')}<div style="flex:1">Regra criada: <b>Uber</b> → Transporte. 4 transações antigas atualizadas.</div><button class="btn ghost" style="height:30px">Desfazer</button></div>
+  <div class="card queue"><h3>Fila de revisão<span class="sp"></span><span class="badge warn">5 restantes</span></h3><div style="margin-top:8px">
+   ${[['Bar do Zé', '17/11 · Pix', -78, 'Alimentação?', 1], ['Pix de Ana Paula R.', '15/11 · Pix recebido', 1500, 'Reembolso?'], ['Drogasil', '17/11 · Cartão Nubank', -36.4, 'Saúde?'],
+      ['MP *LOJA123', '14/11 · Mercado Pago', -64.9, 'Compras?'], ['PAG*JoseDaSilva', '12/11 · Cartão Inter', -120, 'Sem sugestão']]
+     .map(([n, s, v, g, on]) => `<div class="q ${on ? 'on' : ''}"><span>${n}</span><span class="num ${v > 0 ? 'in' : ''}">${brl(v, true)}</span><span class="t-xs muted">${s}</span><span class="t-xs" style="color:var(--warning)">${g}</span></div>`).join('')}</div></div>
+  <div class="card"><h3>Atalhos</h3><div class="t-sm ink2" style="display:grid;gap:8px;margin-top:10px">
+   <span><span class="mono muted">Enter</span> confirmar sugestão</span><span><span class="mono muted">1–8</span> escolher categoria</span><span><span class="mono muted">S</span> pular · <span class="mono muted">D</span> dividir</span></div></div>
+ </div>
+</div></div></main>`;
+</script></body></html>

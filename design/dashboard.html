@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel</title><link rel="stylesheet" href="tokens.css">
+<style>
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+.s3 { grid-column: span 3 } .s4 { grid-column: span 4 } .s5 { grid-column: span 5 } .s7 { grid-column: span 7 } .s8 { grid-column: span 8 }
+.chart { position: relative; margin-top: 14px; }
+.donut-wrap { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; margin-top: 14px; }
+.insight { display: grid; grid-template-columns: 32px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.insight:first-of-type { border-top: 0; }
+.bud { display: grid; gap: 6px; padding: 9px 0; }
+.bud .top-row { display: flex; justify-content: space-between; font-size: 13px; }
+.bill { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); }
+.bill:first-of-type { border-top: 0; }
+.date-box { text-align: center; border: 1px solid var(--border); border-radius: 10px; padding: 4px 0; }
+.date-box b { display: block; font-size: 16px; font-weight: 500; } .date-box span { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.leg-inline { display: flex; gap: 24px; font-size: 13px; color: var(--ink-2); }
+.leg-inline span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.kpi .d { white-space: normal; overflow-wrap: anywhere; }
+</style></head>
+<body><div class="app" id="app"></div>
+<script src="app.js"></script>
+<script>
+const spend = [
+  { k: 'moradia', v: 1850.00, c: 'var(--c1)' }, { k: 'alimentacao', v: 1326.40, c: 'var(--c2)' },
+  { k: 'contas', v: 842.15, c: 'var(--c3)' }, { k: 'transporte', v: 612.80, c: 'var(--c4)' },
+  { k: 'compras', v: 548.90, c: 'var(--c5)' }, { k: 'lazer', v: 389.50, c: 'var(--c6)' },
+  { k: 'demais', v: 644.62, c: 'var(--c-rest)', n: 'Demais (4)' },
+];
+const total = spend.reduce((s, d) => s + d.v, 0);
+
+document.getElementById('app').innerHTML = sidebar('dashboard') + `<main class="main">${topbar('Painel')}
+<div class="content"><div class="bento">
+  <div class="card kpi s3"><h3>${icon('wallet', 'sm')}Saldo consolidado</h3><div class="v num" data-count="18432.90">R$ 18.432,90</div><div class="d">5 contas · atualizado 06:12</div></div>
+  <div class="card kpi s3"><h3>${icon('arrowin', 'sm')}Entradas no mês</h3><div class="v num in">R$ 11.353,40</div><div class="d">Salário, 1 Pix recebido e rendimentos</div></div>
+  <div class="card kpi s3"><h3>${icon('arrowout', 'sm')}Saídas no mês</h3><div class="v num out">R$ 6.214,37</div><div class="d"><span class="out">▲ 8,2%</span> vs. outubro até o dia 17</div></div>
+  <div class="card kpi s3"><h3>${icon('clock', 'sm')}Projeção para 30/11</h3><div class="v num" id="projv">R$ 15.247,82</div><div class="d">após R$ 3.205,33 a vencer</div></div>
+
+  <div class="card s8"><h3>Fluxo de caixa · saldo diário</h3><div style="margin-top:8px"><span class="leg-inline"><span><i class="sw" style="background:var(--ink)"></i>Realizado</span><span><i class="sw" style="background:none;border:1.5px dashed var(--ink-2)"></i>Projetado</span></span></div>
+     <div class="chart" id="flow"></div></div>
+  <div class="card s4"><h3>Gastos por categoria<span class="sp"></span><span class="t-sm muted">até 17/11</span></h3>
+     <div class="donut-wrap" style="grid-template-columns:1fr"><div id="donut" style="display:grid;place-items:center"></div>
+     <div class="legend">${spend.map(d => `<div class="row"><i class="dot" style="background:${d.c}"></i><span>${d.n || CATS[d.k].n}</span><span class="num">${brl(d.v)}</span><span class="pct num">${Math.round(d.v / total * 100)}%</span></div>`).join('')}</div></div></div>
+
+  <div class="card s4"><h3>Entradas × saídas · 6 meses</h3><div style="margin-top:8px"><span class="leg-inline"><span><i class="sw" style="background:var(--in-mark)"></i>Entradas</span><span><i class="sw" style="background:var(--out-mark)"></i>Saídas</span></span></div>
+     <div class="chart" id="bars"></div></div>
+  <div class="card s4"><h3>${icon('target', 'sm')}Orçamentos<span class="sp"></span><a class="t-sm link" href="moodboard.html">Ver todos</a></h3>
+     <div style="margin-top:8px">${[
+       ['Compras', 548.90, 500, 'critical', 'Estourou R$ 48,90'], ['Alimentação', 1326.40, 1400, 'warning', '95% usado'],
+       ['Transporte', 612.80, 700, 'warning', '88% usado'], ['Lazer', 389.50, 600, 'good', '65% usado']].map(([n, v, l, s, t]) => `
+       <div class="bud"><div class="top-row"><span>${n}</span><span class="num ink2">${brl(v)} <span class="muted">/ ${brl(l).replace(',00', '')}</span></span></div>
+       <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, v / l * 100)}%;background:${s === 'good' ? 'var(--ink-2)' : `var(--${s})`}"></div></div>
+       <span class="pill-status t-xs" style="color:${s === 'good' ? 'var(--muted)' : s === 'critical' ? 'var(--critical-text)' : `var(--${s})`}">${s !== 'good' ? icon('alert', 'sm') : ''}${t}</span></div>`).join('')}</div></div>
+  <div class="card s4"><h3>${icon('calendar', 'sm')}A vencer</h3><div style="margin-top:8px">${[
+       ['20', 'nov', 'Fatura Nubank', 2180.44, 'Cartão'], ['22', 'nov', 'Enel', 214.90, 'Contas fixas'],
+       ['25', 'nov', 'Condomínio', 690.00, 'Moradia'], ['28', 'nov', 'Vivo Fibra', 119.99, 'Contas fixas']].map(([d, m, n, v, c]) => `
+       <div class="bill"><div class="date-box"><b class="num">${d}</b><span>${m}</span></div><div><div>${n}</div><div class="t-xs muted">${c}</div></div><span class="num t-sm">${brl(v)}</span></div>`).join('')}</div></div>
+
+  <div class="card s7"><h3>Maiores gastos do mês</h3><div class="list" style="margin-top:6px">${[
+       ['moradia', 'Aluguel · Pix para Imob. Lar Paulista', 'Nubank · 05/11 09:14', -1850], ['alimentacao', 'Pão de Açúcar', 'Inter · 15/11 19:42', -412.3],
+       ['compras', 'Amazon (3/6)', 'Cartão Nubank · 08/11', -289.9], ['transporte', 'Shell Select', 'Cartão Inter · 12/11', -248.6],
+       ['lazer', 'Ingresso.com', 'Mercado Pago · 10/11 21:03', -180]].map(([c, n, s, v]) => `
+       <div class="row"><span class="ico-box">${icon(CATS[c].i)}</span><div><div>${n}</div><div class="t-xs muted">${CATS[c].n} · ${s}</div></div><span class="num out">${brl(v)}</span></div>`).join('')}</div></div>
+  <div class="card s5"><h3>${icon('bell', 'sm')}Avisos do mês</h3><div style="margin-top:6px">
+     <div class="insight"><span class="ico-box">${icon('food', 'sm')}</span><div><div>Alimentação está <b class="out">30% acima</b> de outubro</div><div class="t-xs ink2">R$ 1.326,40 até o dia 17 contra R$ 1.020,30 no mesmo período.</div></div></div>
+     <div class="insight"><span class="ico-box" style="color:var(--warning)">${icon('alert', 'sm')}</span><div><div>Possível cobrança duplicada: Spotify</div><div class="t-xs ink2">2 × R$ 21,90 em 14/11 no cartão Inter. <a href="revisar.html" class="link">Revisar</a></div></div></div>
+     <div class="insight"><span class="ico-box">${icon('inbox', 'sm')}</span><div><div>7 transações para revisar</div><div class="t-xs ink2">Categoria com baixa confiança. Leva menos de 1 minuto.</div></div></div>
+  </div></div>
+</div></div></main>`;
+
+donut(document.getElementById('donut'), spend, total);
+
+// ---- fluxo de caixa (linha + projeção tracejada)
+(function () {
+  const W = 760, H = 330, L = 64, B = 26, T = 10;
+  const ev = { 1: 0, 3: -142, 5: 9850 - 1850, 6: -320, 8: -289.9, 9: -96, 10: -260, 11: -88, 12: -340, 13: -120, 14: -184, 15: 1500 - 612, 16: -95, 17: -78 };
+  const proj = { 20: -2180.44, 22: -214.9, 25: -690, 28: -119.99 };
+  let bal = 12600.27, pts = [];
+  for (let d = 1; d <= 30; d++) { bal += (d <= 17 ? ev[d] || -35 : (proj[d] || 0) - 0); pts.push([d, bal]); }
+  const fix = 18432.90 - pts[16][1]; pts = pts.map(([d, v]) => [d, v + fix]);
+  const lo = 10000, hi = 22500;
+  const x = d => L + (d - 1) / 29 * (W - L - 10), y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  const fmt = v => 'R$ ' + (v / 1000).toLocaleString('pt-BR') + ' mil';
+  let g = '';
+  [10000, 12500, 15000, 17500, 20000, 22500].forEach(v => g += `<line x1="${L}" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 8}" y="${y(v) + 4}" fill="var(--muted)" font-size="13" text-anchor="end" class="num">${fmt(v)}</text>`);
+  [1, 5, 10, 15, 20, 25, 30].forEach(d => g += `<text x="${x(d)}" y="${H - 6}" fill="var(--muted)" font-size="13" text-anchor="middle" class="num">${String(d).padStart(2, '0')}/11</text>`);
+  const real = pts.slice(0, 17), fut = pts.slice(16);
+  const path = a => a.map(([d, v], i) => (i ? 'L' : 'M') + x(d).toFixed(1) + ' ' + y(v).toFixed(1)).join('');
+  const area = path(real) + `L${x(17)} ${H - B}L${x(1)} ${H - B}Z`;
+  const hx = x(12), hv = pts[11][1];
+  document.getElementById('projv').textContent = brl(pts[29][1]);
+  document.getElementById('flow').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Saldo diário de novembro">
+    <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0efec" stop-opacity=".10"/><stop offset="1" stop-color="#f0efec" stop-opacity="0"/></linearGradient></defs>
+    ${g}<line x1="${L}" x2="${W - 10}" y1="${H - B}" y2="${H - B}" stroke="var(--axis)"/>
+    <path d="${area}" fill="url(#ga)"/>
+    <path d="${path(real)}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path(fut)}" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-dasharray="5 5"/>
+    <line x1="${x(17)}" x2="${x(17)}" y1="${T}" y2="${H - B}" stroke="var(--axis)" stroke-dasharray="2 4"/>
+    <text x="${x(17) + 6}" y="${T + 12}" fill="var(--muted)" font-size="13">hoje</text>
+    <line x1="${hx}" x2="${hx}" y1="${T}" y2="${H - B}" stroke="var(--border-strong)"/>
+    <circle cx="${hx}" cy="${y(hv)}" r="5" fill="var(--ink)" stroke="var(--surface-1)" stroke-width="2"/>
+    <circle cx="${x(30)}" cy="${y(pts[29][1])}" r="4.5" fill="var(--surface-1)" stroke="var(--ink-2)" stroke-width="2"/>
+    <text x="${x(30) - 8}" y="${y(pts[29][1]) + 22}" fill="var(--ink-2)" font-size="13" text-anchor="end" class="num">${brl(pts[29][1])}</text>
+  </svg><div class="tooltip" style="left:${hx / W * 100 + 1.5}%;top:${y(hv) / H * 100 + 6}%"><div class="muted">Qui, 12/11</div><div class="num" style="font-size:14px;font-weight:500;margin-top:2px">${brl(hv)}</div><div class="num out t-xs">− R$ 340,00 no dia</div></div>`;
+})();
+
+// ---- barras agrupadas entradas × saídas
+(function () {
+  const m = [['jun', 9850, 7420], ['jul', 9850, 8130], ['ago', 10420, 7880], ['set', 9850, 6950], ['out', 9850, 7610], ['nov', 11353.4, 6214.37]];
+  const W = 440, H = 260, L = 56, B = 26, T = 8, max = 12000;
+  const y = v => T + (1 - v / max) * (H - T - B), gw = (W - L) / m.length, bw = 16;
+  let s = '';
+  [0, 4000, 8000, 12000].forEach(v => s += `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="${v ? 'var(--grid)' : 'var(--axis)'}"/><text x="${L - 8}" y="${y(v) + 4}" font-size="18" fill="var(--muted)" text-anchor="end" class="num">${v ? v / 1000 + ' mil' : '0'}</text>`);
+  const bar = (cx, v, c, op = 1) => { const h = H - B - y(v), r = 4; return `<path d="M${cx} ${H - B}V${y(v) + r}q0 -${r} ${r} -${r}h${bw - 2 * r}q${r} 0 ${r} ${r}V${H - B}Z" fill="${c}" opacity="${op}"/>`; };
+  m.forEach(([n, a, b], i) => {
+    const cx = L + gw * i + gw / 2 - bw - 1, last = i === m.length - 1;
+    s += bar(cx, a, 'var(--in-mark)') + bar(cx + bw + 2, b, 'var(--out-mark)', last ? .55 : 1);
+    s += `<text x="${cx + bw + 1}" y="${H - 6}" font-size="18" fill="${last ? 'var(--ink-2)' : 'var(--muted)'}" text-anchor="middle">${n}${last ? '*' : ''}</text>`;
+  });
+  s += `<text x="${L + gw * 1 + gw / 2 + 1}" y="${y(8130) - 8}" font-size="18" fill="var(--ink-2)" text-anchor="start" class="num">8,1 mil</text>`;
+  document.getElementById('bars').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Entradas e saídas por mês">${s}</svg><div class="t-xs muted" style="margin-top:6px">* novembro parcial, até 17/11</div>`;
+})();
+
+// contagem única do saldo ao abrir (1000 ms); valor final já está no HTML e fica parado com movimento reduzido
+(function () { const el = document.querySelector('[data-count]'); if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const to = +el.dataset.count, t0 = performance.now(), ease = t => 1 - Math.pow(1 - t, 3);
+  el.style.minWidth = el.offsetWidth + 'px';
+  (function f(t) { const k = Math.min(1, (t - t0) / 1000); el.textContent = brl(to * ease(k)); if (k < 1) requestAnimationFrame(f); })(t0); })();
+</script></body></html>

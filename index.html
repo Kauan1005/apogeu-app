@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apogeu · finanças pessoais com Open Finance</title>
+  <meta name="description" content="Vitrine do Apogeu: site pessoal de finanças conectado ao Open Finance. Protótipos com dados fictícios." />
+  <style>
+    :root { --bg:#0b0c0e; --surface:#121417; --border:#23272d; --text:#eceef0; --dim:#8a919b; --accent:#f0b44c; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif; }
+    main { max-width: 1040px; margin: 0 auto; padding: 56px 20px 80px; }
+    h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px; }
+    .lede { color: var(--dim); font-size: 18px; max-width: 640px; margin: 0 0 28px; }
+    .tag { display:inline-block; font-size: 13px; color: var(--accent); border:1px solid var(--border); border-radius:999px; padding:3px 12px; margin-bottom:18px; }
+    .hero { width:100%; border:1px solid var(--border); border-radius:14px; display:block; }
+    h2 { font-size: 22px; letter-spacing: -0.02em; margin: 48px 0 16px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
+    .card { display:block; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; transition: transform 180ms ease, border-color 180ms ease; }
+    .card:hover { transform: translateY(-2px); border-color:#343a43; }
+    .card img { width:100%; display:block; border-bottom:1px solid var(--border); }
+    .card span { display:block; padding:12px 14px; }
+    .card strong { display:block; font-size:15px; }
+    .card small { color:var(--dim); }
+    ul { padding-left: 20px; color: var(--dim); }
+    li { margin-bottom: 6px; }
+    li strong { color: var(--text); }
+    a { color: var(--accent); }
+    footer { color: var(--dim); font-size: 14px; margin-top: 56px; }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="tag">Protótipos com dados fictícios</span>
+    <h1>Apogeu</h1>
+    <p class="lede">Site pessoal de finanças conectado ao Open Finance: importa as transações dos bancos, categoriza sozinho e mostra para onde o dinheiro vai e o que ainda vai vencer.</p>
+    <img class="hero" src="docs/img/painel.png" alt="Painel do Apogeu com saldo, fluxo de caixa e gastos por categoria" />
+
+    <h2>O que ele faz</h2>
+    <ul>
+      <li><strong>Painel:</strong> saldo, entradas e saídas do mês, fluxo de caixa com projeção e gastos por categoria.</li>
+      <li><strong>Transações:</strong> todas as contas e cartões numa tabela, com busca, filtros e divisão de compras.</li>
+      <li><strong>Categorização que aprende:</strong> regras e semelhança de texto; o que não tem certeza vai para a fila Revisar.</li>
+      <li><strong>Contas a pagar, cartões, orçamentos e metas.</strong></li>
+    </ul>
+
+    <h2>Explore os protótipos</h2>
+    <div class="grid">
+      <a class="card" href="design/dashboard.html"><img src="docs/img/painel.png" alt="" /><span><strong>Painel</strong><small>Visão geral do mês</small></span></a>
+      <a class="card" href="design/tabela.html"><img src="docs/img/transacoes.png" alt="" /><span><strong>Transações</strong><small>Tabela, filtros e categorias</small></span></a>
+      <a class="card" href="design/revisar.html"><img src="docs/img/revisar.png" alt="" /><span><strong>Revisar</strong><small>Fila do que precisa de confirmação</small></span></a>
+      <a class="card" href="design/contas.html"><img src="docs/img/contas.png" alt="" /><span><strong>Contas a pagar</strong><small>Calendário e vencimentos</small></span></a>
+      <a class="card" href="design/cartoes.html"><img src="docs/img/cartoes.png" alt="" /><span><strong>Cartões</strong><small>Faturas e limites</small></span></a>
+      <a class="card" href="design/mobile.html"><img src="docs/img/celular.png" alt="" /><span><strong>Celular</strong><small>Versão para telas pequenas</small></span></a>
+    </div>
+
+    <footer>
+      Stack: Next.js · TypeScript · Supabase · Open Finance · app Android (TWA).
+      Código dos protótipos e do app Android neste <a href="https://github.com/Kauan1005/apogeu-app">repositório</a>.
+    </footer>
+  </main>
+</body>
+</html>

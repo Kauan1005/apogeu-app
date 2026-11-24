@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moodboard</title><link rel="stylesheet" href="tokens.css">
+<style>
+body { padding: 48px 56px; }
+h1 { font-size: 40px; font-weight: 500; letter-spacing: -0.03em; }
+h2 { font-size: 13px; font-weight: 500; color: var(--muted);  margin-bottom: 14px; }
+.mb { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-top: 32px; }
+.s4 { grid-column: span 4 } .s5 { grid-column: span 5 } .s7 { grid-column: span 7 } .s8 { grid-column: span 8 } .s6 { grid-column: span 6 } .s12 { grid-column: span 12 }
+.sw { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.sw div { border-radius: 12px; height: 76px; border: 1px solid var(--border); padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; font-size: 13px; }
+.sw div b { font-weight: 500; font-size: 13px; }
+.type .big { font-size: 56px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+.type .row { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--border); padding: 12px 0; }
+.icons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.icons span { display: grid; justify-items: center; gap: 8px; padding: 14px 4px; border-radius: 12px; background: var(--surface-2); font-size: 13px; color: var(--ink-2); }
+.motion .row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.refs .row { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
+</style></head>
+<body>
+<div style="display:flex;justify-content:space-between;align-items:end"><div><div class="t-sm muted">Fluxo · finanças pessoais</div><h1>Moodboard e sistema visual</h1></div>
+<div class="ink2 t-sm" style="max-width:420px;text-align:right">Escuro, neutro e preciso. A cor só aparece quando carrega significado: entrada, saída, alerta ou categoria.</div></div>
+<div class="mb" id="mb"></div>
+<script src="app.js"></script>
+<script>
+const sw = (bg, n, hex, ink = 'var(--ink)') => `<div style="background:${bg};color:${ink}"><b>${n}</b><span class="mono" style="opacity:.75">${hex}</span></div>`;
+document.getElementById('mb').innerHTML = `
+<div class="card s7"><h2>Superfícies e tinta</h2><div class="sw">${sw('#0b0b0b', 'Fundo', '#0b0b0b')}${sw('#141413', 'Cartão', '#141413')}${sw('#1a1a19', 'Elevado', '#1a1a19')}${sw('#222220', 'Controle', '#222220')}
+ ${sw('#f0efec', 'Texto', '#f0efec', '#0b0b0b')}${sw('#c3c2b7', 'Texto 2', '#c3c2b7', '#0b0b0b')}${sw('#8f8d86', 'Apoio', '#8f8d86', '#0b0b0b')}${sw('#7fb4ff', 'Foco', '#7fb4ff', '#0b0b0b')}</div></div>
+<div class="card s5"><h2>Entrada, saída e status</h2><div class="sw" style="grid-template-columns:repeat(2,1fr)">${sw('#36ad78', 'Entrada', 'texto #3fbf7f', '#0b0b0b')}${sw('#bd4646', 'Saída', 'texto #e66767')}
+ <div style="background:var(--surface-2)"><span class="pill-status" style="color:var(--warning)">${icon('alert', 'sm')}Atenção · 95%</span></div><div style="background:var(--surface-2)"><span class="pill-status" style="color:#ef7a7a">${icon('alert', 'sm')}Atrasada</span></div></div>
+ <div class="t-xs muted" style="margin-top:10px">Verde e vermelho validados para daltonismo (ΔE 10,6). Sempre com sinal + / − e seta, nunca só cor.</div></div>
+<div class="card s8"><h2>Categorias (6 cores fixas + “Demais”)</h2><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+ ${[['moradia', '--c1'], ['alimentacao', '--c2'], ['contas', '--c3'], ['transporte', '--c4'], ['compras', '--c5'], ['lazer', '--c6'], ['saude', '--c-rest'], ['assinaturas', '--c-rest'], ['educacao', '--c-rest'], ['investimentos', '--c-rest'], ['outros', '--c-rest'], ['salario', '--c-rest']]
+   .map(([k, c]) => `<span class="chip" style="height:40px;border-radius:10px;justify-content:flex-start;padding:0 12px"><span class="dot" style="background:var(${c})"></span>${icon(CATS[k].i, 'sm')}${CATS[k].n}</span>`).join('')}</div>
+ <div class="t-xs muted" style="margin-top:10px">Nos gráficos, as 6 maiores categorias do mês ganham cor na ordem validada; o restante vira “Demais”. A cor segue a categoria, não a posição.</div></div>
+<div class="card s4 type"><h2>Tipografia · Geist</h2><div class="big num">R$ 18.432,90</div>
+ <div class="row" style="margin-top:14px"><span>Título · 18/500</span><span class="muted t-sm">Painel</span></div>
+ <div class="row"><span>Texto · 14/400</span><span class="muted t-sm">Pão de Açúcar</span></div>
+ <div class="row"><span class="mono t-sm">Geist Mono · 12</span><span class="muted mono t-xs">PIX ENVIADO JOSE C S</span></div>
+ <div class="t-xs muted">Números sempre tabulares para alinhar colunas.</div></div>
+<div class="card s6"><h2>Componentes</h2><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+ <button class="btn primary">${icon('check', 'sm')}Confirmar</button><button class="btn">${icon('download', 'sm')}Exportar</button><button class="btn ghost">Pular</button><button class="btn icon">${icon('eye')}</button>
+ <span class="chip">${icon('filter', 'sm')}Conta: todas</span><span class="chip" style="color:var(--warning)">${icon('alert', 'sm')}Revisar · 54%</span><span class="badge warn">7</span>
+ <div class="seg"><span class="on">Dia</span><span>Categoria</span><span>Mês</span></div></div>
+ <div style="margin-top:18px;display:grid;gap:8px"><div style="display:flex;justify-content:space-between" class="t-sm"><span>Alimentação</span><span class="num ink2">R$ 1.326,40 / R$ 1.400</span></div><div class="bar-track"><div class="bar-fill" style="width:95%;background:var(--warning)"></div></div></div>
+ <div class="t-xs muted" style="margin-top:14px">Cantos 8 / 12 / 16 px · bordas de 1 px a 8% de branco · alvos de toque ≥ 44 px no celular · foco visível em azul.</div></div>
+<div class="card s6"><h2>Ícones · SVG de traço, nunca emoji</h2><div class="icons">${['dashboard', 'table', 'inbox', 'calendar', 'card', 'target', 'pix', 'transfer', 'split', 'clip', 'eyeoff', 'lock'].map(i => `<span>${icon(i, 'lg')}${i}</span>`).join('')}</div></div>
+<div class="card s6 motion"><h2>Movimento · 150 a 500 ms, só transform e opacity</h2>
+ <div class="row"><span class="ink2">Números</span><span>contam do zero ao valor em 600 ms ao abrir o painel (uma vez por sessão)</span></div>
+ <div class="row"><span class="ink2">Troca de tela</span><span>fade + 8 px de deslocamento, 220 ms, curva ease-out</span></div>
+ <div class="row"><span class="ink2">Linha nova</span><span>entra com fundo realçado que some em 1,2 s</span></div>
+ <div class="row"><span class="ink2">Botões</span><span>pressionar = escala 0,97 em 120 ms</span></div>
+ <div class="row"><span class="ink2">Reduzir movimento</span><span>tudo estático, valores finais na hora</span></div></div>
+<div class="card s6 refs"><h2>Referências</h2>
+ <div class="row"><span class="ink2">Organizze</span><span>cartão por fatura, data da compra × fatura, limites por categoria, tags</span></div>
+ <div class="row"><span class="ink2">Pierre</span><span>importação sem esforço, alertas de duplicadas, categorização que aprende</span></div>
+ <div class="row"><span class="ink2">Actual Budget</span><span>motor de regras, fila de revisão com teclado, deduplicação na importação</span></div>
+ <div class="row"><span class="ink2">Linear / Vercel</span><span>escuro neutro, bordas finas, densidade calma, atalhos de teclado</span></div></div>`;
+</script></body></html>

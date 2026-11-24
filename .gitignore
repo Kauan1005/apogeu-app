@@ -1,0 +1,19 @@
+# Segredos e artefatos: nunca entram no repositório
+*.keystore
+*.jks
+keystore-senha*
+SEGREDOS*
+.env
+.env.*
+*.apk
+*.aab
+*.idsig
+local.properties
+
+# compilação e dependências
+node_modules/
+build/
+.gradle/
+android/sdk/
+android/jdk*/
+*.log

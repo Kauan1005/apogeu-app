@@ -1,0 +1,42 @@
+﻿{
+  "packageId": "app.vercel.apogeu_financas.twa",
+  "host": "apogeu-financas.vercel.app",
+  "name": "Apogeu Â· finanÃ§as pessoais",
+  "launcherName": "Apogeu",
+  "display": "standalone",
+  "themeColor": "#0b0b0b",
+  "themeColorDark": "#0b0b0b",
+  "navigationColor": "#0b0b0b",
+  "navigationColorDark": "#0b0b0b",
+  "navigationDividerColor": "#0b0b0b",
+  "navigationDividerColorDark": "#0b0b0b",
+  "backgroundColor": "#0b0b0b",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://apogeu-financas.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://apogeu-financas.vercel.app/icons/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./apogeu-release.keystore",
+    "alias": "apogeu"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://apogeu-financas.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://apogeu-financas.vercel.app/",
+  "minSdkVersion": 24,
+  "orientation": "default",
+  "additionalTrustedOrigins": [],
+  "retainedBundles": []
+}
+

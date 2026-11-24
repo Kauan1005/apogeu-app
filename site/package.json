@@ -1,0 +1,58 @@
+{
+  "name": "apogeu",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "node --env-file=.env.local --env-file=.env.test.local tests/api.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/ui.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/phase3.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/signup.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/audit.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/extra.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/security.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/novidades.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/mfa-habitos.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/aparencia.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/aporte.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/extrato.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/offline.test.mjs && node --env-file=.env.local --env-file=.env.test.local tests/novos.test.mjs",
+    "test:extras": "node --env-file=.env.local --env-file=.env.test.local tests/extra.test.mjs",
+    "test:auditoria": "node --env-file=.env.local --env-file=.env.test.local tests/audit.test.mjs",
+    "test:cadastro": "node --env-file=.env.local --env-file=.env.test.local tests/signup.test.mjs",
+    "test:fase3": "node --env-file=.env.local --env-file=.env.test.local tests/phase3.test.mjs",
+    "test:api": "node --env-file=.env.local --env-file=.env.test.local tests/api.test.mjs",
+    "test:ui": "node --env-file=.env.local --env-file=.env.test.local tests/ui.test.mjs",
+    "test:security": "node --env-file=.env.local --env-file=.env.test.local tests/security.test.mjs",
+    "test:novidades": "node --env-file=.env.local --env-file=.env.test.local tests/novidades.test.mjs",
+    "test:mfa": "node --env-file=.env.local --env-file=.env.test.local tests/mfa-habitos.test.mjs",
+    "test:aparencia": "node --env-file=.env.local --env-file=.env.test.local tests/aparencia.test.mjs",
+    "test:aporte": "node --env-file=.env.local --env-file=.env.test.local tests/aporte.test.mjs",
+    "test:extrato": "node --env-file=.env.local --env-file=.env.test.local tests/extrato.test.mjs",
+    "test:offline": "node --env-file=.env.local --env-file=.env.test.local tests/offline.test.mjs",
+    "test:novos": "node --env-file=.env.local --env-file=.env.test.local tests/novos.test.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.119.0",
+    "@tanstack/react-table": "8.21.3",
+    "exceljs": "4.4.0",
+    "next": "16.4.6",
+    "pdf-lib": "1.17.1",
+    "pluggy-sdk": "0.94.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-pluggy-connect": "2.12.0",
+    "server-only": "0.0.1",
+    "web-push": "3.6.7",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/web-push": "3.6.4",
+    "axe-core": "4.14.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "playwright-core": "1.56.1",
+    "supabase": "3.2.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "uuid": "11.1.1"
+  }
+}

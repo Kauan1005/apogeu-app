@@ -36,11 +36,12 @@ Site pessoal de finanças conectado ao **Open Finance**: importa as transações
 
 | Pasta | Conteúdo |
 |---|---|
+| [`site/`](site/) | O código do site: Next.js, TypeScript, migrações do Supabase com RLS e 14 suítes de testes de ponta a ponta |
 | [`design/`](design/) | Protótipos em HTML/CSS/JS (painel, transações, revisar, contas, cartões, celular, moodboard) |
 | [`android/app/`](android/app/) | O app Android: código-fonte e configuração (`twa-manifest.json`) |
 | [`docs/img/`](docs/img/) | Capturas dos protótipos usadas neste README |
 
-O código do site em si fica em um repositório privado. Aqui estão só os protótipos e o app Android. O keystore de assinatura, senhas e chaves **nunca** entram no repositório.
+O repositório tem também o **código do site** (pasta [`site/`](site/)), numa cópia limpa e sem histórico: sem chaves, sem variáveis de ambiente e sem os scripts que operam o site publicado. As capturas e protótipos usam **dados fictícios**. O keystore de assinatura, senhas e chaves **nunca** entram no repositório.
 
 ## Rodar os protótipos
 
